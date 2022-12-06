@@ -53,9 +53,10 @@ The CurrencyConverter class contains a dictionary of supported currencies and th
 ## Usage
 
 To use the application, clone this repository and run the ConsoleBankApp.sln file in Visual Studio. Then, build and run the solution.
-Limitations
 
-    The application does not support real-time currency conversion, as the exchange rates are fixed and not updated dynamically.
-    The application does not support transferring funds between accounts.
-    The application does not support account locking or other security measures.
-    The application does not support internationalization or localization.
+### Limitations
+
+- The application does not support real-time currency conversion, as the exchange rates are fixed and not updated dynamically.
+- The application does not support transferring funds between accounts.
+- The application does not support account locking or other security measures.
+- The application does not support internationalization or localization.
