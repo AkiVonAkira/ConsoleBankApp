@@ -167,10 +167,10 @@
             // Prompt the user for their currency and currency type
             decimal balance = InputDecimalValidator("Enter your starting currency amount: ");
 
-            string currency = InputStringValidator("Enter your currency code (eg: USD, GBP, EUR): ");
+            string currency = InputStringValidator("Enter your currency code (eg: USD, GBP, EUR): ").ToUpper();
 
             // Check if the currency code is valid
-            if (!Currencies.ContainsKey(currency.ToUpper()))
+            if (!Currencies.ContainsKey(currency))
             {
                 Console.WriteLine("\nSorry, that is not a valid currency code. Please enter a valid code.");
                 currency = InputStringValidator("Enter your currency code: ");
@@ -181,6 +181,9 @@
 
             // Add the new account to the list of accounts
             accounts.Add(newAccount);
+
+            // Save the account information to the JSON file
+            SaveAccounts();
 
             Console.WriteLine("\nYour account has been created successfully!\n");
 
@@ -244,7 +247,7 @@
             while (showUserMenu)
             {
                 Console.WriteLine("----------------------------------------\n" +
-                    $"\nWelcome back, {user._accountName}! Your current balance is {user._balance} {user._currency}\n");
+                    $"\nWelcome back, {user._accountName}! Your current balance is {user._balance:.###} {user._currency}\n");
 
                 // Print the available options
                 for (int i = 0; i < options.Length; i++)
@@ -315,6 +318,9 @@
                 }
                 Console.WriteLine();
             }
+
+            // Save the account information to the JSON file
+            SaveAccounts();
         }
 
         private static void ViewAccountBalance(Account user)
@@ -425,7 +431,7 @@
         private static void SaveAccounts(List<Account> accounts)
         {
             // Serialize the list of accounts to a JSON string
-            string json = JsonConvert.SerializeObject(accounts);
+            string json = JsonConvert.SerializeObject(accounts, Formatting.Indented);
 
             // Write the JSON string to a file
             File.WriteAllText("accounts.json", json);
@@ -474,13 +480,13 @@
         /// <summary>
         ///  These are general functions
         /// </summary>
-        private static decimal InputDecimalValidator(string message)
+        private static decimal InputDecimalValidator(string prompt)
         {
             decimal userInput = 0;
             bool validInput = false;
             while (!validInput)
             {
-                Console.Write(message);
+                Console.Write(prompt);
                 validInput =
                     decimal.TryParse(Console.ReadLine(), out userInput);
                 if (!validInput)
