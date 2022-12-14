@@ -167,10 +167,10 @@
             // Prompt the user for their currency and currency type
             decimal balance = InputDecimalValidator("Enter your starting currency amount: ");
 
-            string currency = InputStringValidator("Enter your currency code: ");
+            string currency = InputStringValidator("Enter your currency code (eg: USD, GBP, EUR): ");
 
             // Check if the currency code is valid
-            if (!Currencies.ContainsKey(currency))
+            if (!Currencies.ContainsKey(currency.ToUpper()))
             {
                 Console.WriteLine("\nSorry, that is not a valid currency code. Please enter a valid code.");
                 currency = InputStringValidator("Enter your currency code: ");
@@ -304,6 +304,8 @@
                     case ConsoleKey.X:
                         Console.Write(options[5]);
                         Console.WriteLine("\n\nThank you for choosing Unknown Bank. Have a great day!");
+                        // Save the account information to the JSON file
+                        SaveAccounts();
                         showUserMenu = false;
                         break;
                     default:
