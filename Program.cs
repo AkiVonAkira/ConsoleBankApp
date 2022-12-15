@@ -7,7 +7,7 @@
     internal class Program
     {
         // Store the account information in a list of Account objects
-        static User[] users = new User[]();
+        static User[] users = new User[] { };
 
         // Define a dictionary to map currency codes to currency names and symbols
         private static readonly Dictionary<string, (string Name, string Symbol, decimal ExchangeRate)> Currencies = new Dictionary<string, (string Name, string Symbol, decimal ExchangeRate)>
@@ -63,11 +63,11 @@
                 {
                     if (i == options.Length - 1)
                     {
-                        Console.WriteLine("(X) " + options[i]);
+                        Console.WriteLine($"(X) {options[i]}");
                     }
                     else
                     {
-                        Console.WriteLine("(" + (i + 1) + ") " + options[i]);
+                        Console.WriteLine($"({i + 1}) {options[i]}");
                     }
                 }
 
@@ -125,16 +125,19 @@
         {
             // Load the account information from the JSON file
             users = LoadAccounts();
+
             Console.Clear();
 
             // Print the list of users and their account balances
-            Console.WriteLine("List of Accounts and Balances: (For Development Purposes Only)\n");
+            Console.WriteLine("----------------------------------------\n" +
+                "List of Accounts and Balances: (For Development Purposes Only)\n");
             foreach (var user in users)
             {
-                Console.WriteLine($"Name: {user.name}");
-                foreach (var account in user.accounts)
+                Console.WriteLine($"----------------------------------------\n\n" +
+                    $"Name: {user.name}\n");
+                foreach (Account account in user.accounts)
                 {
-                    Console.WriteLine($"\n{account.name.ToUpper()} Account Balance: " +
+                    Console.WriteLine($"{account.name.ToUpper()} Account Balance: " +
                     $"{Currencies[account.currency].Symbol}{account.balance} " +
                     $"{Currencies[account.currency].Name}\n");
                 }
@@ -167,35 +170,12 @@
                 userName = InputStringValidator("\nPlease enter your Account Name: ");
             }
 
-            string password = PasswordInput("Please enter your Password: ");
+            string pinCode = PinInput("Please enter your PIN Code: ");
 
             // Prompt the user for their account type
             decimal accountAmmounts = InputDecimalValidator("How many accounts do you want to open? ");
 
-            //Account[] newAccounts = new Account();
-
-            User[] newAccounts = new User[]
-            {
-                new User{
-                   name = "abc.xyz@email.com",
-                   password = "English",
-                   accounts = new Account[]
-                   {
-                       new Account
-                       {
-                           name = "Savings",
-                           currency = "SEK",
-                           balance = 1000
-                       },
-                        new Account
-                       {
-                           name = "Payroll",
-                           currency = "SEK",
-                           balance = 3000
-                       }
-                   }
-                }
-            };
+            Account[] newAccounts = new Account[] { };
 
             for (int i = 0; i < accountAmmounts; i++)
             {
@@ -213,24 +193,25 @@
                     currency = InputStringValidator("Enter your currency code (eg: USD, GBP, EUR): ");
                 }
 
-                //newAccounts[i].name = accountTypeName;
-                //newAccounts[i].currency = currency;
-                //newAccounts[i].balance = balance;
+                newAccounts[i].name = accountTypeName;
+                newAccounts[i].currency = currency;
+                newAccounts[i].balance = balance;
             }
 
             // Create a new User object with the user's information
             // Account[] newAccount = new Account(accountTypeName, currency, balance);
-            User newUser = new User(userName, password, newAccounts);
+            User newUser = new User(userName, pinCode, newAccounts);
 
             // Add the new account to the list of accounts
-            users.Add(newUser);
+            Array.Resize(ref users, users.Length + 1);
+            users[users.Length - 1] = newUser;
 
             // Save the account information to the JSON file
             SaveAccounts();
 
             Console.WriteLine("\nYour account has been created successfully!\n");
 
-            return newAccount;
+            return newUser;
         }
 
         private static User Login()
@@ -253,19 +234,19 @@
             // Check if the user was found in the accounts list
             if (user != null)
             {
-                // User was found, prompt for the password
-                string password = PasswordInput("Please enter your Password: ");
+                // User was found, prompt for the pin code
+                string pinCode = PinInput("Please enter your PIN Code: ");
 
-                // Check if the password is correct
-                if (user.password == password)
+                // Check if the pin is correct
+                if (user.pinCode == pinCode)
                 {
                     //Console.WriteLine("\nWelcome back, " + user._accountName + "!\n");
                     return user;
                 }
                 else
                 {
-                    // Incorrect password, show an error message
-                    Console.WriteLine("\nSorry, that is not the correct password. Please try again.");
+                    // Incorrect pin, show an error message
+                    Console.WriteLine("\nSorry, that is not the correct PIN. Please try again.");
                     return null;
                 }
             }
@@ -282,26 +263,35 @@
             // Load the account information from the JSON file
             users = LoadAccounts();
             // Define an array with the options
-            string[] options = { "Deposit Funds", "Withdraw Funds", "Transfer Funds", "Account Inquiry", "Change Password", "Exit" };
+            string[] options = { "Deposit Funds", "Withdraw Funds", "Transfer Funds", "Account Inquiry", "Change PIN", "Exit" };
 
+            decimal totalBalance = 0;
+            string userCurrency = string.Empty;
 
             // Use a while loop to show the menu and handle user input
             bool showUserMenu = true;
             while (showUserMenu)
             {
                 Console.WriteLine("----------------------------------------\n" +
-                    $"\nWelcome back, {user.name}! Your current balance is {user.balance:.###} {user._currency}\n");
+                    $"\nWelcome back, {user.name}! ");
+                for (int i = 0; i < user.accounts.Length; i++)
+                {
+                    totalBalance += user.accounts[i].balance;
+                    userCurrency = user.accounts[i].currency;
+                    //Console.WriteLine($"Your {user.accounts[i].name:.###} Account balance is {user.accounts[i].balance:.###} {user.accounts[i].currency}\n");
+                }
+                Console.WriteLine($"Your total balance is {totalBalance:.###} {Currencies[userCurrency].Name}\n");
 
                 // Print the available options
                 for (int i = 0; i < options.Length; i++)
                 {
                     if (i == options.Length - 1)
                     {
-                        Console.WriteLine("(X) " + options[i]);
+                        Console.WriteLine($"(X) {options[i]}");
                     }
                     else
                     {
-                        Console.WriteLine("(" + (i + 1) + ") " + options[i]);
+                        Console.WriteLine($"({i + 1}) {options[i]}");
                     }
                 }
 
@@ -321,23 +311,7 @@
                         break;
                     case ConsoleKey.D3:
                         Console.Write(options[2]);
-                        Console.WriteLine("\n----------------------------------------\n" +
-                            "\n--- Transfer Funds ---");
-
-                        // Get the recipient account
-                        string recipient = InputStringValidator("Which account would you like to transfer to? ");
-                        User recipientAccount = users.SingleOrDefault(a => a.name == recipient);
-
-                        // Check if the recipient account exists
-                        if (recipientAccount == null)
-                        {
-                            Console.WriteLine("\nRecipient Account not found.");
-                            return;
-                        }
-
-                        // Get the amount to transfer
-                        decimal amount = InputDecimalValidator("\nHow much would you like to transfer? ");
-                        Transaction(user, recipientAccount, amount);
+                        TransferUser(user);
                         break;
                     case ConsoleKey.D4:
                         Console.Write(options[3]);
@@ -345,7 +319,7 @@
                         break;
                     case ConsoleKey.D5:
                         Console.Write(options[4]);
-                        ChangePassword(user);
+                        ChangePin(user);
                         break;
                     case ConsoleKey.X:
                         Console.Write(options[5]);
@@ -366,19 +340,70 @@
             SaveAccounts();
         }
 
+        private static void TransferUser(User user)
+        {
+            Console.WriteLine("\n----------------------------------------\n" +
+                            "\n--- Transfer Funds ---");
+
+            // Get the users account
+            ListUserAccounts(user);
+            int userAccountNR = Convert.ToInt32(InputDecimalValidator("Select the Account you want to transfer from: "));
+            Account userAccount = user.accounts[userAccountNR];
+
+            // Get the recipient user
+            string recipient = InputStringValidator("Which user would you like to transfer to? ");
+            User recipientUser = users.SingleOrDefault(a => a.name == recipient);
+
+            // Check if the recipient account exists
+            if (recipientUser == null)
+            {
+                Console.WriteLine("\nRecipient Account not found.");
+                return;
+            }
+
+            // Get the recipients account
+            ListUserAccounts(recipientUser);
+            int recipientAccountNR = Convert.ToInt32(InputDecimalValidator("Select the Account you want to transfer to: "));
+            Account recipientAccount = recipientUser.accounts[recipientAccountNR];
+
+            // Get the amount to transfer
+            decimal amount = InputDecimalValidator("\nHow much would you like to transfer? ");
+            Transaction(userAccount, recipientAccount, amount);
+        }
+
+        private static void ListUserAccounts(User user)
+        {
+            for (int i = 0; i < user.accounts.Length; i++)
+            {
+                Console.WriteLine($"({i}) {user.accounts[i].name} Account");
+            }
+        }
+
         private static void ViewAccountBalance(User user)
         {
             Console.WriteLine("\n----------------------------------------\n" +
-                $"\n--- Account Inquiry ---\nYour current balance is {Currencies[user._currency].Symbol}{user.balance} {Currencies[user._currency].Name} " +
-                $"\nWith an exchange rate of {Currencies[user._currency].ExchangeRate}.");
+                $"\n--- Account Inquiry ---\n");
+
+            Console.WriteLine($"Name: {user.name}");
+            foreach (var account in user.accounts)
+            {
+                Console.WriteLine($"\n{account.name.ToUpper()} Account Balance: " +
+                $"{Currencies[account.currency].Symbol}{account.balance} " +
+                $"{Currencies[account.currency].Name}" +
+                $"\nWith an exchange rate of {Currencies[account.currency].ExchangeRate}\n");
+            }
         }
         private static void MakeDeposit(User user)
         {
             Console.WriteLine("\n----------------------------------------\n" +
             "\n--- Deposit Funds ---");
+            ListUserAccounts(user);
+            int userAccountNR = Convert.ToInt32(InputDecimalValidator("Select the Account you want to deposit to: "));
+            Account userAccount = user.accounts[userAccountNR];
+
             decimal depositAmount = InputDecimalValidator("Enter the amount you want to deposit: ");
-            user.balance += depositAmount;
-            Console.WriteLine("\nYour new balance is " + user.balance + " " + user._currency + ".");
+            userAccount.balance += depositAmount;
+            Console.WriteLine("\nYour new balance is " + userAccount.balance + " " + userAccount.currency + ".");
             SaveAccounts(users);
         }
 
@@ -386,63 +411,66 @@
         {
             Console.WriteLine("\n----------------------------------------\n" +
                 "\n--- Withdraw Funds ---");
+            ListUserAccounts(user);
+            int userAccountNR = Convert.ToInt32(InputDecimalValidator("Select the Account you want to withdraw from: "));
+            Account userAccount = user.accounts[userAccountNR];
+
             decimal withdrawAmount = InputDecimalValidator("Enter the amount you want to withdraw: ");
 
             // Check if the user has enough funds to withdraw the specified amount
-            if (user.balance >= withdrawAmount)
+            if (userAccount.balance >= withdrawAmount)
             {
-                user.balance -= withdrawAmount;
-                Console.WriteLine($"\nYour new balance is {user.balance} {user._currency}.");
+                userAccount.balance -= withdrawAmount;
+                Console.WriteLine($"\nYour new balance is {userAccount.balance} {userAccount.currency}.");
                 SaveAccounts(users);
             }
             else
             {
-                Console.WriteLine($"\nInsufficient funds. Your balance is {user.balance} {user._currency}.");
+                Console.WriteLine($"\nInsufficient funds. Your balance is {userAccount.balance} {userAccount.currency}.");
             }
         }
 
-        private static void ChangePassword(User user)
+        private static void ChangePin(User user)
         {
-            // Prompt the user for their current password
-            string currentPassword = PasswordInput("Enter your current password: ");
+            // Prompt the user for their current PIN
+            string currentPinCode = PinInput("Enter your current PIN Code: ");
 
             // Check if the current password is correct
-            if (user.password != currentPassword)
+            if (user.pinCode != currentPinCode)
             {
-                Console.WriteLine("Incorrect password. Please try again.");
-                ChangePassword(user);
+                Console.WriteLine("Incorrect PIN. Please try again.");
+                ChangePin(user);
             }
             else
             {
-                // Prompt the user for their new password
-                string newPassword = PasswordInput("Enter your new password: ");
+                // Prompt the user for their new PIN
+                string newPinCode = PinInput("Enter your new PIN Code: ");
 
                 // Update the user's password in the list of accounts
-                user.password = newPassword;
-                Console.WriteLine("Password successfully changed!");
-
+                user.pinCode = newPinCode;
                 SaveAccounts(users);
+                Console.WriteLine("PIN Code successfully changed!");
             }
         }
 
 
-        private static void Transaction(User senderAccount, User recipientAccount, decimal amount)
+        private static void Transaction(Account senderAccount, Account recipientAccount, decimal amount)
         {
             // Load the accounts from the accounts file
-            User[] accounts = LoadAccounts();
+            User[] users = LoadAccounts();
 
             // Check if the sender account has sufficient funds to exchange the specified amount
             if (senderAccount.balance >= amount)
             {
                 // Convert the amount to the currency of the recipient account
-                decimal convertedAmount = CurrencyConverter(senderAccount._currency, recipientAccount._currency, amount);
+                decimal convertedAmount = CurrencyConverter(senderAccount.currency, recipientAccount.currency, amount);
 
                 // Transfer the converted amount from the sender account to the recipient account
                 senderAccount.balance -= amount;
                 recipientAccount.balance += convertedAmount;
 
                 // Save the updated accounts to the accounts file
-                SaveAccounts(accounts);
+                SaveAccounts(users);
 
                 Console.WriteLine("Funds transferred successfully!");
             }
@@ -482,8 +510,6 @@
 
         private static User[] LoadAccounts()
         {
-            User[] accounts = new User[]();
-
             // Check if the accounts file exists
             if (File.Exists("accounts.json"))
             {
@@ -493,7 +519,7 @@
                     string json = File.ReadAllText("./accounts.json");
 
                     // Deserialize the JSON string and convert it to a list of accounts
-                    accounts = JsonConvert.DeserializeObject<User[]>(json);
+                    users = JsonConvert.DeserializeObject<User[]>(json);
                 }
                 catch (ArgumentNullException ex)
                 {
@@ -504,44 +530,55 @@
             else
             {
                 // If the accounts file does not exist, create an array of default accounts
-                User[] newAccounts = new User[]
+                User[] defaultUsers = new User[]
                 {
-                new User{
-                   name = "abc.xyz@email.com",
-                   password = "English",
-                   accounts = new Account[]
-                   {
-                       new Account
+                    new User("User 1","123",
+                       new Account[]
                        {
-                           name = "Savings",
-                           currency = "SEK",
-                           balance = 1000
-                       },
-                        new Account
-                       {
-                           name = "Payroll",
-                           currency = "SEK",
-                           balance = 3000
+                           new Account("Savings","SEK",1000)
                        }
-                   }
-                }
+                    ),
+                    new User("User 2","123",
+                       new Account[]
+                       {
+                           new Account("Savings","SEK",1000),
+                           new Account("Interest","SEK", 10000)
+                       }
+                    ),
+                    new User("User 3","123",
+                       new Account[]
+                       {
+                           new Account("Savings","SEK",1000),
+                           new Account("Interest","SEK", 10000),
+                           new Account("Offshore","USD", 10000)
+                       }
+                    ),
+                    new User("User 4","123",
+                       new Account[]
+                       {
+                           new Account("Savings","SEK",1000),
+                           new Account("Interest","SEK", 10000),
+                           new Account("Offshore","USD", 10000),
+                           new Account("Interest","SEK", 10000)
+                       }
+                    ),
+                    new User("User 5","123",
+                       new Account[]
+                       {
+                           new Account("Savings","SEK",1000),
+                           new Account("Interest","SEK", 10000),
+                           new Account("Offshore","USD", 10000),
+                           new Account("Interest","SEK", 10000),
+                           new Account("Offshore","USD", 10000),
+                       }
+                    ),
                 };
 
-                //Account[] account1 = { new Account("Savings", "USD", 100) };
-                //User[] defaultUsers =
-                //{
-                //    new User("user1", "password1", account1),
-                //    //new Account("user2", "password2", 200, "EUR", { "b" }),
-                //    //new Account("user3", "password3", 300, "GBP", { "c" }),
-                //    //new Account("user4", "password4", 400, "CHF", { "d" }),
-                //    //new Account("user5", "password5", 500, "JPY", { "e" })
-                //};
-
                 // Add the default accounts to the list of accounts
-                accounts.AddRange(defaultUsers);
+                users = defaultUsers;
             }
 
-            return accounts;
+            return users;
         }
 
         /// <summary>
@@ -554,8 +591,7 @@
             while (!validInput)
             {
                 Console.Write(prompt);
-                validInput =
-                    decimal.TryParse(Console.ReadLine(), out userInput);
+                validInput = decimal.TryParse(Console.ReadLine(), out userInput);
                 if (!validInput)
                 {
                     Console.WriteLine("Invalid input. Please try again.");
@@ -567,11 +603,11 @@
         private static string InputStringValidator(string prompt)
         {
             string userInput = "";
-            while (userInput.Length == 0 || userInput.Contains(" "))
+            while (userInput.Length == 0)
             {
                 Console.Write(prompt);
                 userInput = Console.ReadLine();
-                if (userInput.Length == 0 || userInput.Contains(" "))
+                if (userInput.Length == 0)
                 {
                     Console.WriteLine("\nThat is not a valid input. Please try again.");
                 }
@@ -611,6 +647,40 @@
             return password;
         }
 
+        public static string PinInput(string prompt)
+        {
+            string pin = "";
+
+            Console.Write(prompt);
+            ConsoleKeyInfo key;
+
+            do
+            {
+                key = Console.ReadKey(true);
+
+                // If the key is not a backspace or enter, add it to the PIN string if it is numeric
+                if (
+                    key.Key != ConsoleKey.Backspace &&
+                    key.Key != ConsoleKey.Enter &&
+                    char.IsDigit(key.KeyChar)
+                )
+                {
+                    pin += key.KeyChar;
+                    Console.Write("•");
+                }
+                // If the key is a backspace, remove the last character from the PIN string
+                else if (key.Key == ConsoleKey.Backspace && pin.Length > 0)
+                {
+                    pin = pin.Substring(0, pin.Length - 1);
+                    Console.Write("\b \b");
+                }
+            }
+            while (key.Key != ConsoleKey.Enter);
+
+            Console.WriteLine();
+            return pin;
+        }
+
         public static bool PromptConfirmation(string prompt)
         {
             Console.WriteLine(prompt);
@@ -637,15 +707,15 @@
     public class User
     {
         public string name { get; set; }
-        public string password { get; set; }
+        public string pinCode { get; set; }
         public Account[] accounts { get; set; }
 
-        //public User(string _name, string _password, Account[] _accounts)
-        //{
-        //    name = _name;
-        //    password = _password;
-        //    accounts = _accounts;
-        //}
+        public User(string _name, string _pinCode, Account[] _accounts)
+        {
+            name = _name;
+            pinCode = _pinCode;
+            accounts = _accounts;
+        }
     }
 
     public class Account
@@ -654,11 +724,11 @@
         public string currency { get; set; }
         public decimal balance { get; set; }
 
-        //public Account(string _name, string _currency, decimal _balance)
-        //{
-        //    name = _name;
-        //    currency = _currency;
-        //    balance = _balance;
-        //}
+        public Account(string _name, string _currency, decimal _balance)
+        {
+            name = _name;
+            currency = _currency;
+            balance = _balance;
+        }
     }
 }

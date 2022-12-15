@@ -1,44 +1,107 @@
 [
   {
-    "_accountName": "user1",
-    "_password": "password1",
-    "_balance": 14100.0,
-    "_currency": "USD"
+    "name": "User 1",
+    "pinCode": "123",
+    "accounts": [
+      {
+        "name": "Savings",
+        "currency": "SEK",
+        "balance": 1000.0
+      }
+    ]
   },
   {
-    "_accountName": "user2",
-    "_password": "password2",
-    "_balance": 5600.0,
-    "_currency": "EUR"
+    "name": "User 2",
+    "pinCode": "123",
+    "accounts": [
+      {
+        "name": "Savings",
+        "currency": "SEK",
+        "balance": 1000.0
+      },
+      {
+        "name": "Interest",
+        "currency": "SEK",
+        "balance": 10000.0
+      }
+    ]
   },
   {
-    "_accountName": "user3",
-    "_password": "password3",
-    "_balance": 300.0,
-    "_currency": "GBP"
+    "name": "User 3",
+    "pinCode": "123",
+    "accounts": [
+      {
+        "name": "Savings",
+        "currency": "SEK",
+        "balance": 1000.0
+      },
+      {
+        "name": "Interest",
+        "currency": "SEK",
+        "balance": 10000.0
+      },
+      {
+        "name": "Offshore",
+        "currency": "USD",
+        "balance": 10000.0
+      }
+    ]
   },
   {
-    "_accountName": "user4",
-    "_password": "password4",
-    "_balance": 400.0,
-    "_currency": "CHF"
+    "name": "User 4",
+    "pinCode": "123",
+    "accounts": [
+      {
+        "name": "Savings",
+        "currency": "SEK",
+        "balance": 1000.0
+      },
+      {
+        "name": "Interest",
+        "currency": "SEK",
+        "balance": 10000.0
+      },
+      {
+        "name": "Offshore",
+        "currency": "USD",
+        "balance": 10000.0
+      },
+      {
+        "name": "Interest",
+        "currency": "SEK",
+        "balance": 10000.0
+      }
+    ]
   },
   {
-    "_accountName": "user5",
-    "_password": "password5",
-    "_balance": 500.0,
-    "_currency": "JPY"
-  },
-  {
-    "_accountName": "Krille",
-    "_password": "123",
-    "_balance": 292150.79545454545454545454545,
-    "_currency": "USD"
-  },
-  {
-    "_accountName": "leo",
-    "_password": "123",
-    "_balance": 1327.0,
-    "_currency": "SEK"
+    "name": "User 5",
+    "pinCode": "123",
+    "accounts": [
+      {
+        "name": "Savings",
+        "currency": "SEK",
+        "balance": 1000.0
+      },
+      {
+        "name": "Interest",
+        "currency": "SEK",
+        "balance": 10000.0
+      },
+      {
+        "name": "Offshore",
+        "currency": "USD",
+        "balance": 10000.0
+      },
+      {
+        "name": "Interest",
+        "currency": "SEK",
+        "balance": 10000.0
+      },
+      {
+        "name": "Offshore",
+        "currency": "USD",
+        "balance": 10000.0
+      }
+    ]
   }
 ]
