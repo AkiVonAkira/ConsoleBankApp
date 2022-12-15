@@ -86,7 +86,7 @@
                         if (loggedInUser != null)
                         {
                             // User was successfully logged in, call the AccountMainMenu method
-                            AccountMainMenu(loggedInUser);
+                            UserMainMenu(loggedInUser);
                         }
                         break;
                     case ConsoleKey.D2:
@@ -98,7 +98,7 @@
                         if (createdUser != null)
                         {
                             // User was successfully created, call the AccountMainMenu method
-                            AccountMainMenu(createdUser);
+                            UserMainMenu(createdUser);
                         }
                         break;
                     case ConsoleKey.D3:
@@ -262,7 +262,7 @@
             }
         }
 
-        private static void AccountMainMenu(User user)
+        private static void UserMainMenu(User user)
         {
             Console.Clear();
             // Load the account information from the JSON file
@@ -302,7 +302,7 @@
                         break;
                     case ConsoleKey.D2:
                         Console.Write(options[1]);
-                        Withdraw(user);
+                        MakeWithdrawal(user);
                         break;
                     case ConsoleKey.D3:
                         Console.Write(options[2]);
@@ -416,7 +416,7 @@
             SaveAccounts(users);
         }
 
-        private static void Withdraw(User user)
+        private static void MakeWithdrawal(User user)
         {
             Console.Clear();
             Console.WriteLine("\n----------------------------------------\n" +
