@@ -537,41 +537,41 @@
                     new User("User 1","123",
                        new Account[]
                        {
-                           new Account("Savings","SEK",1000, "SEK")
+                           new Account("Savings","SEK", 1000, "SEK")
                        }
                     ),
                     new User("User 2","123",
                        new Account[]
                        {
-                           new Account("Savings","SEK",1000, "SEK"),
-                           new Account("Interest","SEK", 10000, "SEK")
+                           new Account("Savings","SEK", 10000, "SEK"),
+                           new Account("Interest","EUR", 1000, "SEK")
                        }
                     ),
                     new User("User 3","123",
                        new Account[]
                        {
-                           new Account("Savings","SEK",1000, "SEK"),
-                           new Account("Interest","SEK", 10000, "SEK"),
-                           new Account("Offshore","USD", 10000, "SEK")
+                           new Account("Savings","USD", 10500, "USD"),
+                           new Account("Interest","EUR", 1500, "USD"),
+                           new Account("Offshore","USD", 6300, "USD")
                        }
                     ),
                     new User("User 4","123",
                        new Account[]
                        {
-                           new Account("Savings","SEK",1000, "SEK"),
-                           new Account("Interest","SEK", 10000, "SEK"),
-                           new Account("Offshore","USD", 10000, "SEK"),
-                           new Account("Interest","SEK", 10000, "SEK")
+                           new Account("Savings","EUR", 26780, "EUR"),
+                           new Account("Interest","USD", 1365, "EUR"),
+                           new Account("Offshore","EUR", 3145, "EUR"),
+                           new Account("Trading","EUR", 23678, "EUR"),
                        }
                     ),
                     new User("User 5","123",
                        new Account[]
                        {
-                           new Account("Savings","SEK",1000, "SEK"),
-                           new Account("Interest","SEK", 10000, "SEK"),
-                           new Account("Offshore","USD", 10000, "SEK"),
-                           new Account("Interest","SEK", 10000, "SEK"),
-                           new Account("Offshore","USD", 10000, "SEK"),
+                           new Account("Savings","SEK", 26780, "SEK"),
+                           new Account("Interest","SEK", 1367, "SEK"),
+                           new Account("Offshore","USD", 2345, "SEK"),
+                           new Account("Trading","EUR", 23678, "SEK"),
+                           new Account("Checkings","SEK", 21590, "SEK"),
                        }
                     ),
                 };
