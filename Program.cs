@@ -169,14 +169,14 @@
             User user = users.FirstOrDefault(a => a.name == userName);
             if (user != null)
             {
-                Console.WriteLine("\nSorry, that account name is already in use. Please enter a different name.");
+                Console.WriteLine("\nSorry, that user name is already in use. Please enter a different name.");
                 userName = InputStringValidator("\nPlease enter your Account Name: ");
             }
 
             string pinCode = PinInput("Please enter your PIN Code: ");
 
             // Prompt the user for their account type
-            decimal accountAmmounts = InputDecimalValidator("How many accounts do you want to open? ");
+            decimal accountAmmounts = InputDecimalValidator("\nHow many accounts do you want to open? ");
 
             Account[] newAccounts = new Account[] { };
 
@@ -185,15 +185,15 @@
                 string accountTypeName = InputStringValidator("\nPlease enter your Account Type (eg: Savings): ");
 
                 // Prompt the user for their currency and currency type
-                decimal balance = InputDecimalValidator("Enter your starting currency amount: ");
+                decimal balance = InputDecimalValidator("\nEnter your starting currency amount: ");
 
-                string currency = InputStringValidator("Enter your currency code (eg: USD, GBP, EUR): ").ToUpper();
+                string currency = InputStringValidator("\nEnter your currency code (eg: USD, GBP, EUR): ").ToUpper();
 
                 // Check if the currency code is valid
                 if (!Currencies.ContainsKey(currency))
                 {
                     Console.WriteLine("\nSorry, that is not a valid currency code. Please enter a valid code.");
-                    currency = InputStringValidator("Enter your currency code (eg: USD, GBP, EUR): ");
+                    currency = InputStringValidator("\nEnter your currency code (eg: USD, GBP, EUR): ");
                 }
 
                 newAccounts[i].name = accountTypeName;
