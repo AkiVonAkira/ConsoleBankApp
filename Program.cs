@@ -3,10 +3,11 @@
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     internal class Program
     {
-        // Store the account information in a list of Account objects
+        // Store the user information in a User Class object
         static User[] users = new User[] { };
 
         // Define a dictionary to map currency codes to currency names and symbols
@@ -92,7 +93,7 @@
                     case ConsoleKey.D2:
                         Console.Write(options[1]);
                         // Call the CreateAccount method and store the returned user object
-                        User createdUser = CreateAccount();
+                        User createdUser = CreateUser();
 
                         // Check if the user object is not null (i.e. the user was successfully created)
                         if (createdUser != null)
@@ -118,7 +119,7 @@
             }
 
             // Save the account information to the JSON file
-            SaveAccounts(users);
+            SaveUsers();
         }
 
         private static void ListAccountsAndBalances()
@@ -150,7 +151,7 @@
             Console.Clear();
         }
 
-        private static User CreateAccount()
+        private static User CreateUser()
         {
             Console.Clear();
             Console.WriteLine("\n----------------------------------------\n" +
@@ -176,33 +177,33 @@
             string pinCode = PinInput("Please enter your PIN Code: ");
 
             // Prompt the user for their account type
-            decimal accountAmmounts = InputDecimalValidator("\nHow many accounts do you want to open? ");
+            int accountAmmounts = Convert.ToInt32(InputDecimalValidator("\nHow many accounts do you want to open? "));
 
-            Account[] newAccounts = new Account[] { };
+            Account[] newAccounts = new Account[accountAmmounts];
+            //List<Account> allAccounts = new List<Account>();
 
             for (int i = 0; i < accountAmmounts; i++)
             {
+                // Prompt the user for their account type name
                 string accountTypeName = InputStringValidator("\nPlease enter your Account Type (eg: Savings): ");
 
                 // Prompt the user for their currency and currency type
-                decimal balance = InputDecimalValidator("\nEnter your starting currency amount: ");
+                decimal accountBalance = InputDecimalValidator("\nEnter your starting currency amount: ");
 
-                string currency = InputStringValidator("\nEnter your currency code (eg: USD, GBP, EUR): ").ToUpper();
+                string accountCurrency = InputStringValidator("\nEnter your currency code (eg: USD, GBP, EUR): ").ToUpper();
 
                 // Check if the currency code is valid
-                if (!Currencies.ContainsKey(currency))
+                if (!Currencies.ContainsKey(accountCurrency))
                 {
                     Console.WriteLine("\nSorry, that is not a valid currency code. Please enter a valid code.");
-                    currency = InputStringValidator("\nEnter your currency code (eg: USD, GBP, EUR): ");
+                    accountCurrency = InputStringValidator("\nEnter your currency code (eg: USD, GBP, EUR): ");
                 }
 
-                newAccounts[i].name = accountTypeName;
-                newAccounts[i].currency = currency;
-                newAccounts[i].balance = balance;
+                Account a = new Account(accountTypeName, accountCurrency, accountBalance, accountCurrency);
+                newAccounts[i] = a;
             }
 
             // Create a new User object with the user's information
-            // Account[] newAccount = new Account(accountTypeName, currency, balance);
             User newUser = new User(userName, pinCode, newAccounts);
 
             // Add the new account to the list of accounts
@@ -210,7 +211,7 @@
             users[users.Length - 1] = newUser;
 
             // Save the account information to the JSON file
-            SaveAccounts(users);
+            SaveUsers();
 
             Console.WriteLine("\nYour account has been created successfully!\n");
 
@@ -267,6 +268,13 @@
             Console.Clear();
             // Load the account information from the JSON file
             users = LoadAccounts();
+            // Find the corresponding user in the users array
+            user = users.FirstOrDefault(u => u.name == user.name);
+            if (user == null)
+            {
+                Console.WriteLine("\nSorry, Something went wrong, we cannot find this user.");
+            }
+
             // Define an array with the options
             string[] options = { "Deposit Funds", "Withdraw Funds", "Transfer Funds", "Account Inquiry", "Change PIN", "Exit" };
 
@@ -320,7 +328,7 @@
                         Console.Write(options[5]);
                         Console.WriteLine("\n\nThank you for choosing Unknown Bank. Have a great day!");
                         // Save the account information to the JSON file
-                        SaveAccounts(users);
+                        SaveUsers();
                         showUserMenu = false;
                         break;
                     default:
@@ -330,9 +338,6 @@
                 }
                 Console.WriteLine();
             }
-
-            // Save the account information to the JSON file
-            SaveAccounts(users);
         }
 
         private static void TransferUserFunds(User user)
@@ -365,7 +370,7 @@
             // Get the amount to transfer
             decimal amount = InputDecimalValidator("\nHow much would you like to transfer? ");
             Transaction(userAccount, recipientAccount, amount);
-            SaveAccounts(users);
+            SaveUsers();
         }
 
         private static void ListUserAccounts(User user, bool showBalance = false)
@@ -413,7 +418,7 @@
             decimal depositAmount = InputDecimalValidator("\nEnter the amount you want to deposit: ");
             userAccount.balance += depositAmount;
             Console.WriteLine($"\nYour new balance is {String.Format("{0:n}", userAccount.balance)} {userAccount.currency}.");
-            SaveAccounts(users);
+            SaveUsers();
         }
 
         private static void MakeWithdrawal(User user)
@@ -432,7 +437,7 @@
             {
                 userAccount.balance -= withdrawAmount;
                 Console.WriteLine($"\nYour new balance is {String.Format("{0:n}", userAccount.balance)} {userAccount.currency}.");
-                SaveAccounts(users);
+                SaveUsers();
             }
             else
             {
@@ -459,16 +464,13 @@
 
                 // Update the user's password in the list of accounts
                 user.pinCode = newPinCode;
-                SaveAccounts(users);
+                SaveUsers();
                 Console.WriteLine("PIN Code successfully changed!");
             }
         }
 
         private static void Transaction(Account senderAccount, Account recipientAccount, decimal amount)
         {
-            // Load the accounts from the accounts file
-            User[] users = LoadAccounts();
-
             // Check if the sender account has sufficient funds to exchange the specified amount
             if (senderAccount.balance >= amount)
             {
@@ -480,7 +482,7 @@
                 recipientAccount.balance += convertedAmount;
 
                 // Save the updated accounts to the accounts file
-                SaveAccounts(users);
+                SaveUsers();
 
                 Console.WriteLine("Funds transferred successfully!");
             }
@@ -501,8 +503,14 @@
             return convertedAmount;
         }
 
-        private static void SaveAccounts(User[] users)
+        private static void SaveUsers()
         {
+            if (users == null)
+            {
+                Console.WriteLine("Error: users object is null, cannot save modifications");
+                return;
+            }
+
             // Serialize the list of accounts to a JSON string
             string json = JsonConvert.SerializeObject(users, Formatting.Indented);
 
